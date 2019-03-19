@@ -5,9 +5,9 @@ namespace SummatorAsync
 {
 	public class Summator
 	{
-		public async Task<long> SumAsync(uint n, CancellationToken cancellation)
+		public async Task<Result> SumAsync(uint n, CancellationToken cancellation)
 		{
-			var sumTask = new Task<long>(() =>
+			var sumTask = new Task<Result>(() =>
 			{
 				return Sum(n, cancellation);
 			});
@@ -17,7 +17,7 @@ namespace SummatorAsync
 			return sum;
 		}
 
-		private long Sum(uint n, CancellationToken cancellation)
+		private Result Sum(uint n, CancellationToken cancellation)
 		{
 			long sum = 0;
 			uint i = 1;
@@ -25,7 +25,7 @@ namespace SummatorAsync
 			{
 				if (cancellation.IsCancellationRequested)
 				{
-					return sum;
+					return new Result(sum, true);
 				}
 
 				checked
@@ -36,7 +36,7 @@ namespace SummatorAsync
 				i++;
 			} while (i < n);
 
-			return sum;
+			return new Result(sum, false);
 		}
 	}
 }

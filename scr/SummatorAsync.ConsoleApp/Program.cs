@@ -34,15 +34,15 @@ namespace SummatorAsync.ConsoleApp
 			var resultCursorTop = Console.CursorTop;
 			var resultCursorLeft = Console.CursorLeft;
 			Console.WriteLine();
-			var sum = await summator.SumAsync(value, cancellation);
-			string result = cancellation.IsCancellationRequested
+			var result = await summator.SumAsync(value, cancellation);
+			string report = result.Cancelled
 				? "cancelled"
-				: sum.ToString();
+				: result.Sum.ToString();
 			var cursorTop = Console.CursorTop;
 			var cursorLeft = Console.CursorLeft;
 			// update result, then go back to current position
 			Console.SetCursorPosition(resultCursorLeft, resultCursorTop);
-			Console.Write(result);
+			Console.Write(report);
 			Console.SetCursorPosition(cursorLeft, cursorTop);
 		}
 
