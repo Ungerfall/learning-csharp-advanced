@@ -7,14 +7,13 @@ namespace SummatorAsync
 	{
 		public async Task<Result> SumAsync(uint n, CancellationToken cancellation)
 		{
-			var sumTask = new Task<Result>(() =>
-			{
-				return Sum(n, cancellation);
-			});
-			sumTask.Start();
-			var sum = await sumTask.ConfigureAwait(false);
-
-			return sum;
+			return await Task.Factory.StartNew(
+				() =>
+				{
+					return Sum(n, cancellation);
+				},
+				cancellation)
+				.ConfigureAwait(false);
 		}
 
 		private Result Sum(uint n, CancellationToken cancellation)
@@ -34,7 +33,7 @@ namespace SummatorAsync
 				}
 
 				i++;
-			} while (i < n);
+			} while (i <= n);
 
 			return new Result(sum, false);
 		}
