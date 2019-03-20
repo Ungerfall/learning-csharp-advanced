@@ -14,50 +14,60 @@ namespace SummatorAsync.ConsoleApp
 			Console.WriteLine();
 
 			var value = ProcessInput();
-			var cancellationSource = new CancellationTokenSource();
-			var cancellation = cancellationSource.Token;
-			SumAndShowResultAsync(value, summator, cancellation);
 			while (true)
 			{
-				value = ProcessInput();
-				cancellationSource.Cancel();
-				cancellationSource = new CancellationTokenSource();
-				cancellation = cancellationSource.Token;
-				SumAndShowResultAsync(value, summator, cancellation);
+				using (var cancellationSource = new CancellationTokenSource())
+				{
+					var cancellation = cancellationSource.Token;
+					SumAndShowResultAsync(value, summator, cancellation);
+					value = ProcessInput();
+					cancellationSource.Cancel();
+				}
 			}
 		}
 
 		static async void SumAndShowResultAsync(uint value, Summator summator, CancellationToken cancellation)
 		{
-			Console.Write("Calculating sum of {0} integers...Result: ", value);
-			// save position to update result after calculation
-			var resultCursorTop = Console.CursorTop;
-			var resultCursorLeft = Console.CursorLeft;
-			Console.WriteLine();
+			int resultCursorTop = default(int);
+			int resultCursorLeft = default(int);
+			EnqueueConsoleAction(() =>
+			{
+				Console.Write("Calculating sum of {0} integers...Result: ", value);
+				// save position to update result after calculation
+				resultCursorTop = Console.CursorTop;
+				resultCursorLeft = Console.CursorLeft;
+				Console.WriteLine();
+			});
 			var result = await summator.SumAsync(value, cancellation);
 			string report = result.Cancelled
 				? "cancelled"
 				: result.Sum.ToString();
-			var cursorTop = Console.CursorTop;
-			var cursorLeft = Console.CursorLeft;
-			// update result, then go back to current position
-			Console.SetCursorPosition(resultCursorLeft, resultCursorTop);
-			Console.Write(report);
-			Console.SetCursorPosition(cursorLeft, cursorTop);
+			EnqueueConsoleAction(() =>
+			{
+				var cursorTop = Console.CursorTop;
+				var cursorLeft = Console.CursorLeft;
+				// update result, then go back to current position
+				Console.SetCursorPosition(resultCursorLeft, resultCursorTop);
+				Console.Write(report);
+				Console.SetCursorPosition(cursorLeft, cursorTop);
+			});
 		}
 
 		static uint ProcessInput()
 		{
-			string input;
+			string input = null;
 			bool inputSucceeded = false;
 			uint result;
 			do
 			{
-				Console.WriteLine(
-					"Enter unsigned integer [{0}..{1}] to calculate sum or type '{2}' to exit the program.",
-					uint.MinValue,
-					uint.MaxValue,
-					exitString);
+				EnqueueConsoleAction(() =>
+				{
+					Console.WriteLine(
+						"Enter unsigned integer [{0}..{1}] to calculate sum or type '{2}' to exit the program.",
+						uint.MinValue,
+						uint.MaxValue,
+						exitString);
+				});
 				input = Console.ReadLine();
 				if (input == exitString)
 				{
@@ -68,6 +78,15 @@ namespace SummatorAsync.ConsoleApp
 			} while (!inputSucceeded);
 
 			return result;
+		}
+
+		static readonly object consoleLock = new object();
+		static void EnqueueConsoleAction(Action action)
+		{
+			lock (consoleLock)
+			{
+				action();
+			}
 		}
 	}
 }
