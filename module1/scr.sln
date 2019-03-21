@@ -3,9 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.489
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SummatorAsync", "SummatorAsync\SummatorAsync.csproj", "{D79E2B44-CF95-4342-BF5E-45EE13045A9F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SummatorAsync", "task1\SummatorAsync\SummatorAsync.csproj", "{D79E2B44-CF95-4342-BF5E-45EE13045A9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SummatorAsync.ConsoleApp", "SummatorAsync.ConsoleApp\SummatorAsync.ConsoleApp.csproj", "{52898EEE-02AF-4B71-A709-FC7F52A88F98}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SummatorAsync.ConsoleApp", "task1\SummatorAsync.ConsoleApp\SummatorAsync.ConsoleApp.csproj", "{52898EEE-02AF-4B71-A709-FC7F52A88F98}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "task1", "task1", "{7C051A35-8D75-436D-99F6-D35124A0ED2C}"
+	ProjectSection(SolutionItems) = preProject
+		task1\task.md = task1\task.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +29,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D79E2B44-CF95-4342-BF5E-45EE13045A9F} = {7C051A35-8D75-436D-99F6-D35124A0ED2C}
+		{52898EEE-02AF-4B71-A709-FC7F52A88F98} = {7C051A35-8D75-436D-99F6-D35124A0ED2C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DC98F0CF-19AB-4105-ADBD-E794C036A33E}
