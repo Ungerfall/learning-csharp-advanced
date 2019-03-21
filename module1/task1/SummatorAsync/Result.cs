@@ -2,13 +2,13 @@
 {
 	public class Result
 	{
-		public Result(long sum, bool cancelled)
+		public Result(ulong sum, bool cancelled)
 		{
 			Sum = sum;
 			Cancelled = cancelled;
 		}
 
-		public long Sum { get; }
+		public ulong Sum { get; }
 
 		public bool Cancelled { get; }
 	}

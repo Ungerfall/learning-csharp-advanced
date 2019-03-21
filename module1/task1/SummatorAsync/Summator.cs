@@ -16,10 +16,15 @@ namespace SummatorAsync
 				.ConfigureAwait(false);
 		}
 
-		private Result Sum(uint n, CancellationToken cancellation)
+		internal Result Sum(uint n, CancellationToken cancellation)
 		{
-			long sum = 0;
-			uint i = 1;
+			if (n == 0u)
+			{
+				return new Result(0ul, false);
+			}
+
+			ulong sum = 1ul;
+			uint i = 1u;
 			do
 			{
 				if (cancellation.IsCancellationRequested)
@@ -27,13 +32,12 @@ namespace SummatorAsync
 					return new Result(sum, true);
 				}
 
+				i++;
 				checked
 				{
 					sum += i;
 				}
-
-				i++;
-			} while (i <= n);
+			} while (i < n);
 
 			return new Result(sum, false);
 		}
