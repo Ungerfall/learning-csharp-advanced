@@ -3,34 +3,34 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.489
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SummatorAsync", "task1\SummatorAsync\SummatorAsync.csproj", "{D79E2B44-CF95-4342-BF5E-45EE13045A9F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SummatorAsync", "async-task1\SummatorAsync\SummatorAsync.csproj", "{D79E2B44-CF95-4342-BF5E-45EE13045A9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SummatorAsync.ConsoleApp", "task1\SummatorAsync.ConsoleApp\SummatorAsync.ConsoleApp.csproj", "{52898EEE-02AF-4B71-A709-FC7F52A88F98}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SummatorAsync.ConsoleApp", "async-task1\SummatorAsync.ConsoleApp\SummatorAsync.ConsoleApp.csproj", "{52898EEE-02AF-4B71-A709-FC7F52A88F98}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "task1", "task1", "{7C051A35-8D75-436D-99F6-D35124A0ED2C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "async-task1", "async-task1", "{7C051A35-8D75-436D-99F6-D35124A0ED2C}"
 	ProjectSection(SolutionItems) = preProject
-		task1\task.md = task1\task.md
+		async-task1\task.md = async-task1\task.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadManager", "task2\DownloadManager\DownloadManager.csproj", "{9FE4411C-C13F-4695-8E23-EB13E16E1017}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadManager", "async-task2\DownloadManager\DownloadManager.csproj", "{9FE4411C-C13F-4695-8E23-EB13E16E1017}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadManager.WindowsFormsApp", "task2\DownloadManager.WindowsFormsApp\DownloadManager.WindowsFormsApp.csproj", "{A43324F4-6593-49B5-90DF-D645BFB360BB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadManager.WindowsFormsApp", "async-task2\DownloadManager.WindowsFormsApp\DownloadManager.WindowsFormsApp.csproj", "{A43324F4-6593-49B5-90DF-D645BFB360BB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "task2", "task2", "{E4986BDC-A75E-4777-A6F9-919647208D09}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "async-task2", "async-task2", "{E4986BDC-A75E-4777-A6F9-919647208D09}"
 	ProjectSection(SolutionItems) = preProject
-		task2\task.md = task2\task.md
+		async-task2\task.md = async-task2\task.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "task4", "task4", "{C89163EF-DF42-4CD0-83F6-D69E29C0EE86}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "async-task4", "async-task4", "{C89163EF-DF42-4CD0-83F6-D69E29C0EE86}"
 	ProjectSection(SolutionItems) = preProject
-		task4\task.md = task4\task.md
+		async-task4\task.md = async-task4\task.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "task4\Data\Data.csproj", "{0A3679FB-7A20-4027-AFAB-3190C5A7AA86}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "async-task4\Data\Data.csproj", "{0A3679FB-7A20-4027-AFAB-3190C5A7AA86}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.FakeAdapter", "task4\Data.FakeAdapter\Data.FakeAdapter.csproj", "{8ED7BD83-D4B4-4C84-94ED-7F68DB0033BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.FakeAdapter", "async-task4\Data.FakeAdapter\Data.FakeAdapter.csproj", "{8ED7BD83-D4B4-4C84-94ED-7F68DB0033BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.ConsoleApp", "task4\Data.ConsoleApp\Data.ConsoleApp.csproj", "{14A3F768-B6F5-4488-8475-9ABE2F668440}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.ConsoleApp", "async-task4\Data.ConsoleApp\Data.ConsoleApp.csproj", "{14A3F768-B6F5-4488-8475-9ABE2F668440}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
