@@ -32,6 +32,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.FakeAdapter", "async-t
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.ConsoleApp", "async-task4\Data.ConsoleApp\Data.ConsoleApp.csproj", "{14A3F768-B6F5-4488-8475-9ABE2F668440}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "multithreading-tasks", "multithreading-tasks", "{D4885651-7755-45A1-919F-E1DE1359DB8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multithreading", "multithreading-tasks\Multithreading\Multithreading.csproj", "{6F6877E8-9460-4CE0-AEBD-764E3EC352AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +70,10 @@ Global
 		{14A3F768-B6F5-4488-8475-9ABE2F668440}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14A3F768-B6F5-4488-8475-9ABE2F668440}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14A3F768-B6F5-4488-8475-9ABE2F668440}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F6877E8-9460-4CE0-AEBD-764E3EC352AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F6877E8-9460-4CE0-AEBD-764E3EC352AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F6877E8-9460-4CE0-AEBD-764E3EC352AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F6877E8-9460-4CE0-AEBD-764E3EC352AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,6 +86,7 @@ Global
 		{0A3679FB-7A20-4027-AFAB-3190C5A7AA86} = {C89163EF-DF42-4CD0-83F6-D69E29C0EE86}
 		{8ED7BD83-D4B4-4C84-94ED-7F68DB0033BE} = {C89163EF-DF42-4CD0-83F6-D69E29C0EE86}
 		{14A3F768-B6F5-4488-8475-9ABE2F668440} = {C89163EF-DF42-4CD0-83F6-D69E29C0EE86}
+		{6F6877E8-9460-4CE0-AEBD-764E3EC352AB} = {D4885651-7755-45A1-919F-E1DE1359DB8D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DC98F0CF-19AB-4105-ADBD-E794C036A33E}
