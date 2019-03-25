@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Multithreading
 {
@@ -155,6 +156,17 @@ namespace Multithreading
 						multiplication[i, j] = mul;
 					}
 				});
+
+			for (int i = 0; i < size; i++)
+			{
+				for (int j = 0; j < size - 1; j++)
+				{
+					Console.Write($"{multiplication[i, j]} ");
+				}
+
+				Console.Write(multiplication[i, size - 1]);
+				Console.WriteLine();
+			}
 		}
 
 		/// <summary>
@@ -166,22 +178,290 @@ namespace Multithreading
 		/// </summary>
 		static void Task4()
 		{
-
+			const int initialState = 10;
+			Task4_CreateThreadRecursively(initialState);
 		}
 
+		static void Task4_CreateThreadRecursively(int state)
+		{
+			if (state <= 0)
+				return;
+
+			var thread = new Thread(threadState =>
+			{
+				var threadStateInt = (int)threadState;
+				--threadStateInt;
+				Console.WriteLine($"Thread: {Thread.CurrentThread.ManagedThreadId}; state = {threadStateInt}");
+				Task4_CreateThreadRecursively(threadStateInt);
+			});
+			thread.Start(state);
+			thread.Join();
+		}
+
+		/// <summary>
+		/// Write a program which recursively creates 10 threads. Each thread 
+		/// should be with the same body and receive a state with integer 
+		/// number, decrement it, print and pass as a state into the newly 
+		/// created thread. 
+		/// Use ThreadPool class for this task and Semaphore for waiting threads.
+		/// </summary>
 		static void Task5()
 		{
-
+			const int semaphorePoolCount = 1;
+			pool = new Semaphore(0, semaphorePoolCount);
+			const int initialState = 10;
+			Task5_CreateThreadRecursively(initialState);
+			pool.Release(semaphorePoolCount);
 		}
 
+		static Semaphore pool;
+		static void Task5_CreateThreadRecursively(int state)
+		{
+			if (state <= 0)
+				return;
+
+			ThreadPool.QueueUserWorkItem(
+				threadState =>
+				{
+					pool.WaitOne();
+					var threadStateInt = (int)threadState;
+					--threadStateInt;
+					Console.WriteLine($"Thread: {Thread.CurrentThread.ManagedThreadId}; state = {threadStateInt}");
+					Task5_CreateThreadRecursively(threadStateInt);
+					pool.Release();
+				},
+				state);
+		}
+
+		static List<int> sharedThreadUnsafeCollection;
+		/// <summary>
+		/// Write a program which creates two threads and a shared collection: 
+		/// the first one should add 10 elements into the collection and the 
+		/// second should print all elements in the collection after each 
+		/// adding. 
+		/// Use Thread, ThreadPool or Task classes for thread creation and any 
+		/// kind of synchronization constructions.
+		/// </summary>
 		static void Task6()
 		{
+			using (var addWait = new ManualResetEventSlim(false))
+			using (var printWait = new ManualResetEventSlim(true))
+			using (var endPrintingWait = new ManualResetEventSlim(false))
+			{
+				sharedThreadUnsafeCollection = new List<int>(10);
+				var rng = new Random();
+				ThreadPool.QueueUserWorkItem(state =>
+				{
+					while (sharedThreadUnsafeCollection.Count < sharedThreadUnsafeCollection.Capacity)
+					{
+						printWait.Wait();
+						//Thread.Sleep(1000);
+						sharedThreadUnsafeCollection.Add(rng.Next(256));
+						addWait.Set();
+						printWait.Reset();
+					}
+					addWait.Set();
+				});
+				ThreadPool.QueueUserWorkItem(state =>
+				{
+					while (addWait.WaitHandle.WaitOne(3000))
+					{
+						Console.WriteLine(string.Join(",", sharedThreadUnsafeCollection));
+						printWait.Set();
+						addWait.Reset();
+					}
+					endPrintingWait.Set();
+				});
 
+				endPrintingWait.Wait();
+			}
 		}
 
+		static readonly Random Random = new Random();
+		/// <summary>
+		/// Create a Task and attach continuations to it according to the 
+		/// following criteria:
+		/// a. Continuation task should be executed regardless of the result of 
+		/// the parent task.
+		/// b. Continuation task should be executed when the parent task 
+		/// finished without success.
+		/// c. Continuation task should be executed when the parent task would 
+		/// be finished with fail and parent task thread should be reused for 
+		/// continuation
+		/// d. Continuation task should be executed outside of the thread pool 
+		/// when the parent task would be cancelled
+		/// </summary>
 		static void Task7()
 		{
+			var continuationStrategies = new Dictionary<int, Action>
+			{
+				[0] = () =>
+				{
+					Task.Factory.StartNew(
+						() =>
+						{
+							if (Random.Next() % 2 == 1)
+							{
+								Console.WriteLine($"Task will be completed with status {TaskStatus.RanToCompletion}");
+								return;
+							}
+							else
+							{
+								Console.WriteLine($"Task will be completed with status {TaskStatus.Faulted}");
+								throw new Exception();
+							}
+						})
+					.ContinueWith(
+						antecedent =>
+						{
+							Console.WriteLine($"Task continued regardless of state ({antecedent.Status})");
+						}
+						,TaskContinuationOptions.None);
+				},
+				[1] = () =>
+				{
+					var tokenSource = new CancellationTokenSource();
+					var token = tokenSource.Token;
+					Task.Factory.StartNew(
+						() =>
+						{
+							var choice = Random.Next(3);
+							if (choice == 0)
+							{
+								tokenSource.Cancel();
+								Console.WriteLine($"Task will be completed with status {TaskStatus.Canceled}");
+								token.ThrowIfCancellationRequested();
+							}
+							else if (choice == 1)
+							{
+								Console.WriteLine($"Task will be completed with status {TaskStatus.Faulted}");
+								throw new Exception();
+							}
+							else
+							{
+								Console.WriteLine($"Task will be completed with status {TaskStatus.RanToCompletion}");
+								return;
+							}
+						},
+						token)
+					.ContinueWith(
+						antecedent =>
+						{
+							if (antecedent.Status == TaskStatus.RanToCompletion)
+							{
+								throw new Exception(
+									"Continuation ran on RanToCompletion, "
+									+ "however TaskContinuationOptions are set to NotOnRanToCompletion");
+							}
 
+							Console.WriteLine($"Task continued with status {antecedent.Status}");
+						},
+						TaskContinuationOptions.NotOnRanToCompletion);
+				},
+				[2] = () =>
+				{
+					var tokenSource = new CancellationTokenSource();
+					var token = tokenSource.Token;
+					var callerThreadId = Thread.CurrentThread.ManagedThreadId;
+					int? taskThreadId = null;
+					Task.Factory.StartNew(
+						() =>
+						{
+							taskThreadId = Thread.CurrentThread.ManagedThreadId;
+							var choice = Random.Next(3);
+							if (choice == 0)
+							{
+								tokenSource.Cancel();
+								Console.WriteLine($"Task will be completed with status {TaskStatus.Canceled}");
+								token.ThrowIfCancellationRequested();
+							}
+							else if (choice == 1)
+							{
+								Console.WriteLine($"Task completed with status {TaskStatus.Faulted}");
+								throw new Exception();
+							}
+							else
+							{
+								Console.WriteLine($"Task completed with status {TaskStatus.RanToCompletion}");
+								return;
+							}
+						},
+						token)
+					.ContinueWith(
+						antecedent =>
+						{
+							if (antecedent.Status != TaskStatus.Faulted)
+							{
+								throw new Exception(
+									$"Continuation ran on {antecedent.Status}, "
+									+ "however TaskContinuationOptions are set to OnlyOnFaulted");
+							}
+
+							var continuationThreadId = Thread.CurrentThread.ManagedThreadId;
+							if (continuationThreadId != callerThreadId && continuationThreadId != taskThreadId)
+							{
+								throw new Exception(
+									"Continuation ran on different thread "
+									+"regardless of ExecuteSynchronously option");
+							}
+
+							Console.WriteLine($"Task continued with status {antecedent.Status}");
+						},
+						TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
+				},
+				[3] = () =>
+				{
+					var tokenSource = new CancellationTokenSource();
+					var token = tokenSource.Token;
+					int? taskThreadId = null;
+					Task.Factory.StartNew(
+						() =>
+						{
+							taskThreadId = Thread.CurrentThread.ManagedThreadId;
+							var choice = Random.Next(3);
+							if (choice == 0)
+							{
+								tokenSource.Cancel();
+								Console.WriteLine($"Task will be completed with status {TaskStatus.Canceled}");
+								token.ThrowIfCancellationRequested();
+							}
+							else if (choice == 1)
+							{
+								Console.WriteLine($"Task completed with status {TaskStatus.Faulted}");
+								throw new Exception();
+							}
+							else
+							{
+								Console.WriteLine($"Task completed with status {TaskStatus.RanToCompletion}");
+								return;
+							}
+						},
+						token)
+					.ContinueWith(
+						antecedent =>
+						{
+							if (antecedent.Status != TaskStatus.Canceled)
+							{
+								throw new Exception(
+									$"Continuation ran on {antecedent.Status}, "
+									+ "however TaskContinuationOptions are set to OnlyOnCanceled");
+							}
+
+							var continuationThreadId = Thread.CurrentThread.ManagedThreadId;
+							if (continuationThreadId == taskThreadId)
+							{
+								throw new Exception(
+									"Continuation ran on same thread as antecedent thread"
+									+"regardless of RunContinuationsAsynchronously option");
+							}
+
+							Console.WriteLine($"Task continued with status {antecedent.Status}");
+						},
+						TaskContinuationOptions.OnlyOnCanceled
+							| TaskContinuationOptions.RunContinuationsAsynchronously);
+				}
+			};
+			continuationStrategies[Random.Next(3)].Invoke();
 		}
 	}
 }
