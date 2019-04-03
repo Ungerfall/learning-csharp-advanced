@@ -1,51 +1,33 @@
-﻿using Messenger.Common;
+﻿using Messenger.Common.Data;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Pipes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Messenger.Server.ConsoleApp
 {
 	class Program
 	{
-		static Dictionary<string, List<string>> clientMessages = new Dictionary<string, List<string>>();
 
 		static void Main(string[] args)
 		{
-			using (var server = new NamedPipeServerStream(Configuration.MESSENGER_PIPE, PipeDirection.InOut))
-			using (StreamReader reader = new StreamReader(server))
-			using (StreamWriter writer = new StreamWriter(server))
+			var messagesRepo = new MessagesFileRepository();
+			using (var server = new MessengerServer(messagesRepo, Console.Out))
 			{
-				server.WaitForConnection();
-				while (true)
+				try
 				{
-					var line = reader.ReadLine();
-					if (line == null)
+					server.StartAsync();
+					while (true)
 					{
-						break;
+						Console.WriteLine("Type 'stop' to exit the program");
+						var input = Console.ReadLine();
+						if (input == "stop")
+						{
+							server.Stop();
+							break;
+						}
 					}
-
-					Console.WriteLine(line);
-					var message = Message.Deserialize(line);
-					string clientName = message.ClientName;
-					if (!clientMessages.ContainsKey(clientName))
-					{
-						clientMessages[clientName] = new List<string> { message.Body };
-					}
-					else
-					{
-						clientMessages[clientName].Add(message.Body);
-					}
-
-					foreach (var client in clientMessages.Where(kv => kv.Key != clientName))
-					{
-						var response = new Message { ClientName = client.Key, Body = message.Body };
-						writer.WriteLine(response.Serialize());
-						writer.Flush();
-					}
+				}
+				catch (Exception)
+				{
+					server.Stop();
 				}
 			}
 		}

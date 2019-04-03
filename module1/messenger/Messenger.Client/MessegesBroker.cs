@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,17 +10,17 @@ namespace Messenger.Client
 {
 	public class MessegesBroker : IDisposable
 	{
-		private static readonly object subscribersLock = new object();
-
-		private List<IMessengerClient> subscribers = new List<IMessengerClient>();
+		private Dictionary<string, IMessengerClient> subscribers = new Dictionary<string, IMessengerClient>();
 		private Queue<Message> messagesQueue = new Queue<Message>();
+		private NamedPipeClientStream client;
+		private StreamReader reader;
+		private StreamWriter writer;
 
-		private readonly NamedPipeClientStream client;
-		private readonly StreamReader reader;
-		private readonly StreamWriter writer;
+		private readonly TextWriter translator;
 
-		public MessegesBroker()
+		public MessegesBroker(TextWriter translator)
 		{
+			this.translator = translator ?? throw new ArgumentNullException(nameof(translator));
 			client = new NamedPipeClientStream(
 				".",
 				Configuration.MESSENGER_PIPE,
@@ -36,6 +34,7 @@ namespace Messenger.Client
 		{
 			var cancellation = default(CancellationToken);
 			client.Connect();
+			translator.WriteLine("connected to server");
 			Task.Run(
 				() =>
 				{
@@ -50,28 +49,24 @@ namespace Messenger.Client
 				cancellation);
 		}
 
-		public void EnqueueMessage(string clientName, string message)
+		public void EnqueueMessage(string clientName, string message, MessageCode code)
 		{
-			messagesQueue.Enqueue(new Message { ClientName = clientName, Body = message });
+			messagesQueue.Enqueue(new Message { From = clientName, Body = message, Code = code });
 		}
 
 		public void Subscribe(IMessengerClient client)
 		{
-			lock (subscribersLock)
+			if (!subscribers.ContainsKey(client.Name))
 			{
-				if (!subscribers.Contains(client))
-				{
-					subscribers.Add(client);
-				}
+				subscribers.Add(client.Name, client);
 			}
+
+			EnqueueMessage(client.Name, string.Empty, MessageCode.Connect);
 		}
 
-		public void Unsubscribe(IMessengerClient messengerClient)
+		public void Unsubscribe(IMessengerClient client)
 		{
-			lock (subscribersLock)
-			{
-				subscribers.Remove(messengerClient);
-			}
+			EnqueueMessage(client.Name, string.Empty, MessageCode.Disconnect);
 		}
 
 		private void ListenServer(CancellationToken cancellation)
@@ -81,13 +76,11 @@ namespace Messenger.Client
 				cancellation.ThrowIfCancellationRequested();
 				var serverMessage = reader.ReadLine();
 				var message = Message.Deserialize(serverMessage);
-				lock (subscribersLock)
+				IMessengerClient subscriber;
+				if (subscribers.TryGetValue(message.To, out subscriber))
 				{
-					foreach (var subscriber in subscribers)
-					{
-						subscriber.ReceiveMessageFromServer(
-							$"For {subscriber.Name} From {message.ClientName}: {message.Body}");
-					}
+					subscriber.ReceiveMessageFromServer(
+						$"{message.From}: {message.Body} for {message.To}");
 				}
 			}
 		}
@@ -106,11 +99,37 @@ namespace Messenger.Client
 			}
 		}
 
+		public bool IsConnected => client.IsConnected;
+
 		public void Dispose()
 		{
-			writer?.Dispose();
-			reader?.Dispose();
-			client?.Dispose();
+			try
+			{
+				writer?.Dispose();
+			}
+			catch { }
+			finally
+			{
+				writer = null;
+			}
+			try
+			{
+				reader?.Dispose();
+			}
+			catch { }
+			finally
+			{
+				reader = null;
+			}
+			try
+			{
+				client?.Dispose();
+			}
+			catch { }
+			finally
+			{
+				client = null;
+			}
 		}
 	}
 }

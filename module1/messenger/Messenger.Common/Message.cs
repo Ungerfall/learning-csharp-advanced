@@ -4,7 +4,11 @@ namespace Messenger.Common
 {
 	public class Message
 	{
-		public string ClientName { get; set; }
+		public MessageCode Code { get; set; }
+
+		public string From { get; set; }
+
+		public string To { get; set; }
 
 		public string Body { get; set; }
 
@@ -17,5 +21,13 @@ namespace Messenger.Common
 		{
 			return JsonConvert.DeserializeObject<Message>(obj);
 		}
+	}
+
+	public enum MessageCode
+	{
+		None = 0,
+		Message = 1,
+		Connect = 2,
+		Disconnect = 3
 	}
 }

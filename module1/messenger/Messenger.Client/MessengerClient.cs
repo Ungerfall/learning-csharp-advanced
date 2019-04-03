@@ -35,7 +35,7 @@ namespace Messenger.Client
 
 		public void SendMessage(string message)
 		{
-			broker.EnqueueMessage(Name, message);
+			broker.EnqueueMessage(Name, message, Common.MessageCode.Message);
 		}
 
 		private void WriteOutput(string msg)

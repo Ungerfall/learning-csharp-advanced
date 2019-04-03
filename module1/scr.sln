@@ -39,7 +39,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "messenger", "messenger", "{8511B61C-8B39-42FD-A93B-DC804613810D}"
 	ProjectSection(SolutionItems) = preProject
 		messenger\start.ps1 = messenger\start.ps1
-		messager\task.md = messager\task.md
+		messenger\task.md = messenger\task.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger.Server.ConsoleApp", "messenger\Messenger.Server.ConsoleApp\Messenger.Server.ConsoleApp.csproj", "{AF87C62B-F362-48C0-933A-F36F56B7885B}"
@@ -49,6 +49,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger.Client", "messenger\Messenger.Client\Messenger.Client.csproj", "{2BF1B6A2-D887-4BD8-8120-3F34120D8795}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger.Common", "messenger\Messenger.Common\Messenger.Common.csproj", "{213C6DC7-E750-4AB3-8E71-AF7AAC2A1EAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger.Server", "messenger\Messenger.Server\Messenger.Server.csproj", "{F5955C4E-32A2-4D31-84CD-3B591E372A27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -104,6 +106,10 @@ Global
 		{213C6DC7-E750-4AB3-8E71-AF7AAC2A1EAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{213C6DC7-E750-4AB3-8E71-AF7AAC2A1EAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{213C6DC7-E750-4AB3-8E71-AF7AAC2A1EAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5955C4E-32A2-4D31-84CD-3B591E372A27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5955C4E-32A2-4D31-84CD-3B591E372A27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5955C4E-32A2-4D31-84CD-3B591E372A27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5955C4E-32A2-4D31-84CD-3B591E372A27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -121,6 +127,7 @@ Global
 		{21FBCA98-B6E7-4F57-B432-CC43B4D3CA00} = {8511B61C-8B39-42FD-A93B-DC804613810D}
 		{2BF1B6A2-D887-4BD8-8120-3F34120D8795} = {8511B61C-8B39-42FD-A93B-DC804613810D}
 		{213C6DC7-E750-4AB3-8E71-AF7AAC2A1EAE} = {8511B61C-8B39-42FD-A93B-DC804613810D}
+		{F5955C4E-32A2-4D31-84CD-3B591E372A27} = {8511B61C-8B39-42FD-A93B-DC804613810D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DC98F0CF-19AB-4105-ADBD-E794C036A33E}

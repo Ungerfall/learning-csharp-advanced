@@ -9,7 +9,6 @@ namespace Messenger.Common
 	public class Configuration
 	{
 		public const string MESSENGER_PIPE = "messenger";
-
 		public static string[] ClientNames = new string[5]
 		{
 			"Leonid",
@@ -32,5 +31,15 @@ namespace Messenger.Common
 			":-)",
 			"Okay"
 		};
+
+		public static string MessagesHistoryFile => "history.json";
+
+		public static string StopMessage => "Server is shutting down...";
+
+		public static string ServerName => "Server";
+
+		public static int HistoryLimit => 10;
+
+		public static int ServerSendDelay => 1;
 	}
 }
