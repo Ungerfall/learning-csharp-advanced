@@ -99,12 +99,40 @@ namespace DocumentsJoiner.Tests
 			await Task.Delay(15 * 1000);
 			File.Copy(testFile, Path.Combine(watcherDir, "prefix_002.png"), true);
 			// sleep to wait till file watcher rises an event
-			await Task.Delay(10 * 1000);
+			await Task.Delay(20 * 1000);
 			worker.Stop();
 
 			try
 			{
 				Assert.AreEqual(2, Directory.GetFiles(config.BatchesFolder).Length);
+			}
+			finally
+			{
+				CleanDirectories(config);
+			}
+		}
+
+		[Test]
+		public async Task EmptyFileNotCreatedWhenOnlyBrokenFile()
+		{
+			var config
+				= (DocumentsJoinerConfigurationSection) ConfigurationManager.GetSection("DocumentsJoiner");
+			SetupDirectories(config);
+
+			var worker = CreateWorker(config);
+			worker.Start();
+			var testFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/test.png");
+			var watcherDir = config.Watchers.Cast<FolderWatcherConfigurationElement>().First().Path;
+			await Task.Delay(3000);
+			File.Copy(testFile, Path.Combine(watcherDir, "aksldoasd_asldjlsad.png"), true);
+			// sleep to wait till file watcher rises an event
+			await Task.Delay(20 * 1000);
+			worker.Stop();
+
+			try
+			{
+				Assert.AreEqual(0, Directory.GetFiles(config.BatchesFolder).Length);
+				Assert.AreEqual(1, Directory.GetFiles(config.BrokenFilesDirectory).Length);
 			}
 			finally
 			{

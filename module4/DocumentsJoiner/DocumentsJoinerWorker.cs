@@ -54,7 +54,6 @@ namespace DocumentsJoiner
 
 		public void Stop()
 		{
-			controller.CollectBatch();
 			cancellationSource.Cancel();
 			worker.Join();
 			SimpleLog.WriteLine("worker stopped");

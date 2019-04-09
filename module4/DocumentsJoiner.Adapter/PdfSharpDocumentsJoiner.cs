@@ -39,7 +39,11 @@ namespace DocumentsJoiner.Wrappers
 				}
 			}
 
-			outputDocument.Save(documentStream, closeStream: false);
+			if (outputDocument.PageCount > 0)
+			{
+				outputDocument.Save(documentStream, closeStream: false);
+			}
+
 			documentStream.Seek(0L, SeekOrigin.Begin);
 			return documentStream;
 		}

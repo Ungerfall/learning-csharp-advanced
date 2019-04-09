@@ -17,7 +17,7 @@ namespace DocumentsJoiner
 		private readonly int timeout;
 
 		private Timer timeoutTimer;
-		private volatile bool isTimeout = false;
+		private ManualResetEvent collectOnTimeoutEvent = new ManualResetEvent(true);
 
 		public DocumentsController(
 			Func<DocumentsController, SortedDictionary<int, IDocumentHandler>> handlersChainFactory,
@@ -32,23 +32,18 @@ namespace DocumentsJoiner
 			this.timeout = timeout;
 
 			handlersChain = handlersChainFactory.Invoke(this);
-			timeoutTimer = new Timer(SetTimeout, null, Timeout.Infinite, Timeout.Infinite);
+			timeoutTimer = new Timer(CollectBatch, null, Timeout.Infinite, Timeout.Infinite);
 		}
 
 		public event EventHandler<DocumentBatchEventArgs> DocumentsBatchCollected;
 
 		public void HandleCandidateDocument(string filepath)
 		{
+			collectOnTimeoutEvent.WaitOne();
 			Document document = null;
 			FileStream stream = null;
 			try
 			{
-				if (isTimeout)
-				{
-					SimpleLog.WriteLine("timeout");
-					CollectBatch();
-				}
-
 				stream = fileReader.AttemptToReadFile(filepath);
 				document = new Document(filepath, stream);
 				foreach (var handler in handlersChain)
@@ -70,19 +65,32 @@ namespace DocumentsJoiner
 			finally
 			{
 				stream?.Dispose();
+				timeoutTimer.Change(timeout, Timeout.Infinite);
 			}
-
-			timeoutTimer.Change(timeout, Timeout.Infinite);
 		}
 
 		public void AddDocumentToBatch(Document document)
 		{
+			if (CurrentBatch == null)
+			{
+				CurrentBatch = new DocumentBatch(document.Number, document.Prefix);
+			}
+
 			CurrentBatch.Add(document);
 		}
 
 		public void CollectBatch()
 		{
 			OnDocumentsBatchCollected();
+			CurrentBatch = null;
+		}
+
+		private void CollectBatch(object state)
+		{
+			collectOnTimeoutEvent.Reset();
+			SimpleLog.WriteLine("timeout");
+			CollectBatch();
+			collectOnTimeoutEvent.Set();
 		}
 
 		protected virtual void OnDocumentsBatchCollected()
@@ -100,10 +108,5 @@ namespace DocumentsJoiner
 		}
 
 		public DocumentBatch CurrentBatch { get; private set; }
-
-		private void SetTimeout(object state)
-		{
-			isTimeout = true;
-		}
 	}
 }
