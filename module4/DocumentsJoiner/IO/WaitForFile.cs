@@ -6,6 +6,8 @@ namespace DocumentsJoiner.IO
 {
 	public class WaitForFile : IWaitForFile
 	{
+		private const int WAIT_MS = 50;
+
 		private readonly int attempts;
 
 		public WaitForFile(int attempts)
@@ -33,7 +35,7 @@ namespace DocumentsJoiner.IO
 				catch (IOException)
 				{
 					fs?.Dispose();
-					Thread.Sleep(50);
+					Thread.Sleep(WAIT_MS);
 					if (i == attempts)
 						throw;
 				}

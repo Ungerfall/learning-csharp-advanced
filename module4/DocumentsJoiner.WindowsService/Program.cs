@@ -13,6 +13,10 @@ namespace DocumentsJoiner.WindowsService
 {
 	class Program
 	{
+		private const string LOG_FILE = "log.txt";
+		private const string SERVICE_NAME = "DocumentsJoiner";
+		private const string SERVICE_CONFIGURATION_SECTION = "DocumentsJoiner";
+
 		private static DocumentsJoinerWorker documentsJoinerWorker;
 
 		static void Main(string[] args)
@@ -29,8 +33,8 @@ namespace DocumentsJoiner.WindowsService
 				});
 				x.RunAsLocalSystem();
 
-				x.SetDisplayName("DocumentsJoiner");
-				x.SetServiceName("DocumentsJoiner");
+				x.SetDisplayName(SERVICE_NAME);
+				x.SetServiceName(SERVICE_NAME);
 			});
 
 			var exitCode = (int) Convert.ChangeType(rc, rc.GetTypeCode());
@@ -39,9 +43,9 @@ namespace DocumentsJoiner.WindowsService
 
 		private static void InitializeDependencies()
 		{
-			Trace.Listeners.Add(new TextWriterTraceListener("log.txt"));
+			Trace.Listeners.Add(new TextWriterTraceListener(LOG_FILE));
 			var configuration
-				= (DocumentsJoinerConfigurationSection) ConfigurationManager.GetSection("DocumentsJoiner");
+				= (DocumentsJoinerConfigurationSection) ConfigurationManager.GetSection(SERVICE_CONFIGURATION_SECTION);
 			var detector = new ZXingBarcodeDetector();
 			Func<DocumentsController, SortedDictionary<int, IDocumentHandler>> handlersChainFactory = ctrl =>
 			{

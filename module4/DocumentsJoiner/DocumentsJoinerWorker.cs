@@ -10,6 +10,8 @@ namespace DocumentsJoiner
 {
 	public class DocumentsJoinerWorker
 	{
+		private const string PDF_NAME_FORMAT = "{0}_{1}_{2}.pdf";
+
 		private readonly DocumentsJoinerConfigurationSection configuration;
 		private readonly Func<DocumentsController> documentsControllerFactory;
 		private readonly Func<CancellationToken, IDocumentsJoiner> documentsJoinerFactory;
@@ -89,7 +91,7 @@ namespace DocumentsJoiner
 			var batch = e.DocumentBatch;
 			var path = Path.Combine(
 				configuration.BatchesFolder,
-				$"{batch.Prefix}_{batch.MinSequenceNumber}_{batch.MaxSequenceNumber}.pdf");
+				string.Format(PDF_NAME_FORMAT, batch.Prefix, batch.MinSequenceNumber, batch.MaxSequenceNumber));
 			var joiner = documentsJoinerFactory.Invoke(cancellationSource.Token);
 			using (var file = File.Create(path))
 			using (var joinedStream = joiner.Join(batch.Documents))

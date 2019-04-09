@@ -61,6 +61,7 @@
     <Compile Include="IO\IWaitForFile.cs" />
     <Compile Include="IO\WaitForFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\ILog.cs" />
     <Compile Include="Utility\SimpleLog.cs" />
   </ItemGroup>
   <ItemGroup />

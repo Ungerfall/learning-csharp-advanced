@@ -5,6 +5,8 @@ namespace DocumentsJoiner.Handlers
 {
 	public class ErrorHandler : IDocumentErrorHandler
 	{
+		private const string ERROR_DOCUMENT_FORMAT = "{0}.error";
+
 		private readonly string brokenFilesDirectoryFullPath;
 
 		public ErrorHandler(string brokenFilesDirectoryFullPath)
@@ -21,7 +23,7 @@ namespace DocumentsJoiner.Handlers
 				document.Stream.CopyTo(file);
 			}
 
-			var errorDocumentName = document.Name + ".error";
+			var errorDocumentName = string.Format(ERROR_DOCUMENT_FORMAT, document.Name);
 			var errorPath = Path.Combine(brokenFilesDirectoryFullPath, errorDocumentName);
 			File.WriteAllText(errorPath, exception.Message);
 		}
