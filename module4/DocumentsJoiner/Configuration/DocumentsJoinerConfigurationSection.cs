@@ -32,6 +32,13 @@ namespace DocumentsJoiner.Configuration
 			set => this["attempts"] = value;
 		}
 
+		[ConfigurationProperty("opening-file-period", IsRequired = true, DefaultValue = "50", IsKey = false)]
+		public int OpeningFilePeriodMs
+		{
+			get => (int) this["opening-file-period"];
+			set => this["opening-file-period"] = value;
+		}
+
 		[ConfigurationProperty("batches", IsRequired = true, IsKey = false)]
 		public string BatchesFolder
 		{

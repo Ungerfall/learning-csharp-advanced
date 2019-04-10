@@ -58,7 +58,7 @@ namespace DocumentsJoiner.WindowsService
 
 				return sorted;
 			};
-			var fileReader = new WaitForFile(configuration.AttemptsToOpenFile);
+			var fileReader = new WaitForFile(configuration.AttemptsToOpenFile, configuration.OpeningFilePeriodMs);
 			var exceptionsHandler = new ErrorHandler(configuration.BrokenFilesDirectory);
 			Func<DocumentsController> controllersFactory
 				= () => new DocumentsController(

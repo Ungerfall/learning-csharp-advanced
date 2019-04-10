@@ -6,18 +6,16 @@ namespace DocumentsJoiner.IO
 {
 	public class WaitForFile : IWaitForFile
 	{
-		private const int WAIT_MS = 50;
-
 		private readonly int attempts;
+		private readonly int period;
 
-		public WaitForFile(int attempts)
+		public WaitForFile(int attempts, int period)
 		{
-			if (attempts <= 0)
-			{
-				throw new ArgumentOutOfRangeException(nameof(attempts));
-			}
+			if (attempts <= 0) throw new ArgumentOutOfRangeException(nameof(attempts));
+			if (period <= 0) throw new ArgumentOutOfRangeException(nameof(period));
 
 			this.attempts = attempts;
+			this.period = period;
 		}
 
 		public FileStream AttemptToReadFile(string fullPath)
@@ -35,7 +33,7 @@ namespace DocumentsJoiner.IO
 				catch (IOException)
 				{
 					fs?.Dispose();
-					Thread.Sleep(WAIT_MS);
+					Thread.Sleep(period);
 					if (i == attempts)
 						throw;
 				}
