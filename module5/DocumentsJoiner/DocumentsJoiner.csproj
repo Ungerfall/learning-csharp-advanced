@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E581E38B-7B37-4EF3-B118-7C0F8400143C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DocumentsJoiner</RootNamespace>
+    <AssemblyName>DocumentsJoiner</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Configuration\DocumentsJoinerConfigurationSection.cs" />
+    <Compile Include="Configuration\FolderWatcherConfigurationCollection.cs" />
+    <Compile Include="Configuration\FolderWatcherConfigurationElement.cs" />
+    <Compile Include="Document.cs" />
+    <Compile Include="DocumentBatch.cs" />
+    <Compile Include="DocumentBatchEventArgs.cs" />
+    <Compile Include="DocumentsJoinerWorker.cs" />
+    <Compile Include="Handlers\BarCodeHandler.cs" />
+    <Compile Include="Handlers\DocumentValidator.cs" />
+    <Compile Include="DocumentsController.cs" />
+    <Compile Include="Handlers\ErrorHandler.cs" />
+    <Compile Include="Handlers\ImageHandler.cs" />
+    <Compile Include="IBarcodeDetector.cs" />
+    <Compile Include="Handlers\IDocumentErrorHandler.cs" />
+    <Compile Include="Handlers\IDocumentHandler.cs" />
+    <Compile Include="IDocumentsJoiner.cs" />
+    <Compile Include="IO\IWaitForFile.cs" />
+    <Compile Include="IO\WaitForFile.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Messaging\Messaging.csproj">
+      <Project>{5673436E-3DAE-4549-98FB-E4468AA31021}</Project>
+      <Name>Messaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Uitlity\Utility.csproj">
+      <Project>{DC937F02-0FC0-46D8-BC6A-4A3FEBB8A3E2}</Project>
+      <Name>Utility</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
