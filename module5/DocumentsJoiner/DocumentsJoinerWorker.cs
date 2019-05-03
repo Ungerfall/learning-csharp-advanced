@@ -3,23 +3,22 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Documents.Core;
 using DocumentsJoiner.Configuration;
 using Messaging;
 using Utility.Logging;
 
 namespace DocumentsJoiner
 {
-	public class DocumentsJoinerWorker
+	public class DocumentsJoinerWorker : Worker, IStatusObservable
 	{
 		private readonly DocumentsJoinerConfigurationSection configuration;
 		private readonly Func<DocumentsController> documentsControllerFactory;
 		private readonly Func<CancellationToken, IDocumentsJoiner> documentsJoinerFactory;
-		private readonly IMessageProducer messageProducer;
+		private readonly IMessageProducer documentsQueue;
 		private readonly List<FileSystemWatcher> documentsWatchers = new List<FileSystemWatcher>();
-		private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
 
 		private DocumentsController controller;
-		private Thread worker;
 
 		public DocumentsJoinerWorker(
 			DocumentsJoinerConfigurationSection configuration,
@@ -32,36 +31,25 @@ namespace DocumentsJoiner
 				= documentsControllerFactory ?? throw new ArgumentNullException(nameof(documentsControllerFactory));
 			this.documentsJoinerFactory
 				= documentsJoinerFactory ?? throw new ArgumentNullException(nameof(documentsJoinerFactory));
-			this.messageProducer = messageProducer ?? throw new ArgumentNullException(nameof(messageProducer));
+			this.documentsQueue = messageProducer ?? throw new ArgumentNullException(nameof(messageProducer));
 			Initialize();
 		}
 
-		public void Start()
+		protected override void OnWorkerStart(CancellationToken token)
 		{
 			ProcessExistingFiles();
-			worker = new Thread(
-				state =>
-				{
-					var token = (CancellationToken) state;
-					foreach (var watcher in documentsWatchers)
-					{
-						watcher.EnableRaisingEvents = true;
-					}
-
-					WaitHandle.WaitAny(new[] {token.WaitHandle});
-					SimpleLog.WriteLine("token cancelled");
-				})
+			Status = DocumentsJoinerStatus.WAITING;
+			foreach (var watcher in documentsWatchers)
 			{
-				IsBackground = true
-			};
-			worker.Start(cancellationSource.Token);
+				watcher.EnableRaisingEvents = true;
+			}
+
+			WaitHandle.WaitAny(new[] {token.WaitHandle});
 		}
 
-		public void Stop()
+		protected override void OnWorkerStop()
 		{
-			cancellationSource.Cancel();
-			worker.Join();
-			SimpleLog.WriteLine("worker stopped");
+			Status = DocumentsJoinerStatus.STOPPED;
 		}
 
 		private void Initialize()
@@ -85,26 +73,32 @@ namespace DocumentsJoiner
 
 		private void HandleNewDocument(object sender, FileSystemEventArgs e)
 		{
+			Status = DocumentsJoinerStatus.PROCESSING_FILES;
 			SimpleLog.WriteLine($"new document appeared {e.Name}");
 			controller.HandleCandidateDocument(e.FullPath);
+			Status = DocumentsJoinerStatus.WAITING;
 		}
 
 		private void ControllerOnDocumentsBatchCollected(object sender, DocumentBatchEventArgs e)
 		{
+			Status = DocumentsJoinerStatus.BUILDING_BATCH;
 			var batch = e.DocumentBatch;
-			var joiner = documentsJoinerFactory.Invoke(cancellationSource.Token);
+			var joiner = documentsJoinerFactory.Invoke(CancellationSource.Token);
 			using (var joinedStream = joiner.Join(batch.Documents))
 			using (var ms = new MemoryStream())
 			{
 				joinedStream.Seek(0, SeekOrigin.Begin);
 				joinedStream.CopyTo(ms);
 				var message = ms.ToArray();
-				messageProducer.SendMessage(message);
+				documentsQueue.SendMessage(message);
 			}
+
+			Status = DocumentsJoinerStatus.WAITING;
 		}
 
 		private void ProcessExistingFiles()
 		{
+			Status = DocumentsJoinerStatus.PROCESSING_EXISTING_FILES;
 			var files = documentsWatchers
 				.SelectMany(x => Directory.EnumerateFiles(x.Path, x.Filter))
 				.OrderBy(x => x);
@@ -115,5 +109,7 @@ namespace DocumentsJoiner
 
 			controller.CollectBatch();
 		}
+
+		public string Status { get; private set; } = DocumentsJoinerStatus.CREATED;
 	}
 }

@@ -33,6 +33,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'joiner0|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\joiner0\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework, Version=3.11.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
@@ -50,6 +59,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Documents.Core\Documents.Core.csproj">
+      <Project>{635C33DF-1D9B-47AB-B496-EEB32ED20DD1}</Project>
+      <Name>Documents.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DocumentsJoiner.Wrappers\DocumentsJoiner.Wrappers.csproj">
       <Project>{7297dba4-4c0e-47d3-9185-b4b3d4b89635}</Project>
       <Name>DocumentsJoiner.Wrappers</Name>
@@ -65,10 +78,6 @@
     <ProjectReference Include="..\Messaging\Messaging.csproj">
       <Project>{5673436e-3dae-4549-98fb-e4468aa31021}</Project>
       <Name>Messaging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Uitlity\Utility.csproj">
-      <Project>{dc937f02-0fc0-46d8-bc6a-4a3febb8a3e2}</Project>
-      <Name>Utility</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Framing;
 using Utility.Logging;
 
@@ -12,7 +11,7 @@ namespace Messaging.RabbitMQ
 	{
 		private ConnectionFactory factory;
 
-		public ChunkedQueue()
+		public ChunkedQueue(CancellationToken token) : base(token)
 		{
 			factory = new ConnectionFactory
 			{
@@ -22,6 +21,10 @@ namespace Messaging.RabbitMQ
 				UserName = UserName,
 				Password = Password
 			};
+		}
+
+		public ChunkedQueue() : this(CancellationToken.None)
+		{
 		}
 
 		public override void SendChunkMessage(Chunk chunk)

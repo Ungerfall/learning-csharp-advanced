@@ -45,5 +45,19 @@ namespace Messaging.Configuration
 			get => (string) this["data-queue"];
 			set => this["data-queue"] = value;
 		}
+
+		[ConfigurationProperty("status-queue", IsRequired = true)]
+		public string StatusQueue
+		{
+			get => (string) this["status-queue"];
+			set => this["status-queue"] = value;
+		}
+
+		[ConfigurationProperty("commands-exchange", IsRequired = true)]
+		public string CommandsExchange
+		{
+			get => (string) this["commands-exchange"];
+			set => this["commands-exchange"] = value;
+		}
 	}
 }

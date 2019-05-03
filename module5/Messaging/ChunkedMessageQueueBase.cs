@@ -15,6 +15,7 @@ namespace Messaging
 		private readonly int chunkSize;
 		private readonly Dictionary<Guid, List<Chunk>> messages = new Dictionary<Guid, List<Chunk>>();
 		private readonly ChunkedMessageBuilder chunksBuilder = new ChunkedMessageBuilder();
+		private readonly CancellationToken token;
 
 		protected string HostName;
 		protected int Port;
@@ -23,7 +24,7 @@ namespace Messaging
 		protected string DataQueueName;
 		protected Encoding Encoding = Encoding.UTF8;
 
-		protected ChunkedMessageQueueBase()
+		protected ChunkedMessageQueueBase(CancellationToken token)
 		{
 			var configuration
 				= (MessagingConfigurationSection) ConfigurationManager.GetSection(SERVICE_CONFIGURATION_SECTION);
@@ -33,6 +34,7 @@ namespace Messaging
 			UserName = configuration.UserName;
 			Password = configuration.Password;
 			DataQueueName = configuration.DataQueue;
+			this.token = token;
 		}
 
 		public void SendMessage(byte[] message)
@@ -49,6 +51,9 @@ namespace Messaging
 			Chunk chunk = null;
 			do
 			{
+				if (token.IsCancellationRequested)
+					break;
+
 				chunk = ReceiveChunkMessage();
 				if (chunk.Equals(Chunk.NullChunk))
 				{

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using Messaging.RabbitMQ;
 using Topshelf;
+using Topshelf.Logging;
 
 namespace DocumentsHub.WindowsService
 {
@@ -10,20 +10,12 @@ namespace DocumentsHub.WindowsService
 		private const string LOG_FILE = "log.txt";
 		private const string SERVICE_NAME = "DocumentsHub";
 
-		private static DocumentsReceiverWorker documentsReceiver;
-
 		static void Main(string[] args)
 		{
-			InitializeDependencies();
+			InitializeLogger();
 			var rc = HostFactory.Run(x =>
 			{
-				x.Service<DocumentsReceiverWorker>(s =>
-				{
-					s.ConstructUsing(
-						name => documentsReceiver);
-					s.WhenStarted(tc => tc.Start());
-					s.WhenStopped(tc => tc.Stop());
-				});
+				x.Service<ServiceFacade>();
 				x.RunAsLocalSystem();
 
 				x.SetDisplayName(SERVICE_NAME);
@@ -34,13 +26,10 @@ namespace DocumentsHub.WindowsService
 			Environment.ExitCode = exitCode;
 		}
 
-		private static void InitializeDependencies()
+		private static void InitializeLogger()
 		{
 			Trace.Listeners.Add(new TextWriterTraceListener(LOG_FILE));
-			var queue = new ChunkedQueue();
-			var path = AppDomain.CurrentDomain.BaseDirectory;
-			IDocumentSaver fileSaver = new SimpleFileSaver(path);
-			documentsReceiver = new DocumentsReceiverWorker(queue, fileSaver);
+			Trace.Listeners.Add(new TopshelfConsoleTraceListener());
 		}
 	}
 }

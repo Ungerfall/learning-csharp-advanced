@@ -33,17 +33,19 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'joiner0|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\joiner0\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
-    <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
     <Reference Include="Topshelf, Version=4.2.0.194, Culture=neutral, PublicKeyToken=b800c4cfcdeea87b, processorArchitecture=MSIL">
       <HintPath>..\packages\Topshelf.4.2.0\lib\net452\Topshelf.dll</HintPath>
     </Reference>
@@ -51,8 +53,13 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceFacade.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Documents.Core\Documents.Core.csproj">
+      <Project>{635C33DF-1D9B-47AB-B496-EEB32ED20DD1}</Project>
+      <Name>Documents.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DocumentsHub\DocumentsHub.csproj">
       <Project>{A09A880C-51DC-4751-A35E-4E9BD458A045}</Project>
       <Name>DocumentsHub</Name>
@@ -64,10 +71,6 @@
     <ProjectReference Include="..\Messaging\Messaging.csproj">
       <Project>{5673436e-3dae-4549-98fb-e4468aa31021}</Project>
       <Name>Messaging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Uitlity\Utility.csproj">
-      <Project>{dc937f02-0fc0-46d8-bc6a-4a3febb8a3e2}</Project>
-      <Name>Utility</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

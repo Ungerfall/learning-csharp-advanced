@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using DocumentsJoiner.Configuration;
 using DocumentsJoiner.Handlers;
 using DocumentsJoiner.IO;
 using Utility.Logging;
+using ThreadingTimeout = System.Threading.Timeout;
 
 namespace DocumentsJoiner
 {
@@ -14,7 +16,6 @@ namespace DocumentsJoiner
 		private readonly SortedDictionary<int, IDocumentHandler> handlersChain;
 		private readonly IDocumentErrorHandler exceptionsHandler;
 		private readonly IWaitForFile fileReader;
-		private readonly int timeout;
 
 		private Timer timeoutTimer;
 		private ManualResetEvent collectOnTimeoutEvent = new ManualResetEvent(true);
@@ -22,17 +23,14 @@ namespace DocumentsJoiner
 		public DocumentsController(
 			Func<DocumentsController, SortedDictionary<int, IDocumentHandler>> handlersChainFactory,
 			IDocumentErrorHandler exceptionsHandler,
-			IWaitForFile fileReader,
-			int timeout)
+			IWaitForFile fileReader)
 		{
 			if (handlersChainFactory == null) throw new ArgumentNullException(nameof(handlersChainFactory));
-			if (timeout <= 0) throw new ArgumentOutOfRangeException(nameof(timeout));
 			this.exceptionsHandler = exceptionsHandler ?? throw new ArgumentNullException(nameof(exceptionsHandler));
 			this.fileReader = fileReader ?? throw new ArgumentNullException(nameof(fileReader));
-			this.timeout = timeout;
 
 			handlersChain = handlersChainFactory.Invoke(this);
-			timeoutTimer = new Timer(CollectBatch, null, Timeout.Infinite, Timeout.Infinite);
+			timeoutTimer = new Timer(CollectBatch, null, ThreadingTimeout.Infinite, ThreadingTimeout.Infinite);
 		}
 
 		public event EventHandler<DocumentBatchEventArgs> DocumentsBatchCollected;
@@ -65,7 +63,7 @@ namespace DocumentsJoiner
 			finally
 			{
 				stream?.Dispose();
-				timeoutTimer.Change(timeout, Timeout.Infinite);
+				timeoutTimer.Change(ConfigurationContext.Timeout, ThreadingTimeout.Infinite);
 			}
 		}
 

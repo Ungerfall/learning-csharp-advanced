@@ -1,54 +1,36 @@
 ﻿using System;
 using System.Threading;
+using Documents.Core;
 using Messaging;
 using Utility.Logging;
 
 namespace DocumentsHub
 {
-	public class DocumentsReceiverWorker
+	public class DocumentsReceiverWorker : Worker
 	{
-		private readonly IMessageConsumer<DocumentMessage> documentsQueue;
+		private readonly Func<CancellationToken, IMessageConsumer<DocumentMessage>> documentsQueueFactory;
 		private readonly IDocumentSaver documentSaver;
-		private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
 
-		private Thread worker;
-
-		public DocumentsReceiverWorker(IMessageConsumer<DocumentMessage> messageQueue, IDocumentSaver documentSaver)
+		public DocumentsReceiverWorker(Func<CancellationToken, IMessageConsumer<DocumentMessage>> messageQueueFactory, IDocumentSaver documentSaver)
 		{
-			this.documentsQueue = messageQueue ?? throw new ArgumentNullException(nameof(messageQueue));
+			documentsQueueFactory = messageQueueFactory
+				?? throw new ArgumentNullException(nameof(messageQueueFactory));
 			this.documentSaver = documentSaver ?? throw new ArgumentNullException(nameof(documentSaver));
 		}
 
-		public void Start()
+		protected override void OnWorkerStart(CancellationToken token)
 		{
-			worker = new Thread(
-				state =>
-				{
-					try
-					{
-						var token = (CancellationToken) state;
-						while (!token.IsCancellationRequested)
-						{
-							var message = documentsQueue.ReceiveMessage();
-							documentSaver.Save(message.Name, message.Content);
-							SimpleLog.WriteLine($"document {message.Name} saved");
-						}
-					}
-					catch (Exception e)
-					{
-						SimpleLog.WriteLine($"exception: {e.Message}");
-					}
-				})
+			var queue = documentsQueueFactory.Invoke(token);
+			while (!token.IsCancellationRequested)
 			{
-				IsBackground = true
-			};
-			worker.Start(cancellationSource.Token);
+				var message = queue.ReceiveMessage();
+				documentSaver.Save(message.Name, message.Content);
+				SimpleLog.WriteLine($"document {message.Name} saved");
+			}
 		}
 
-		public void Stop()
+		protected override void OnWorkerStop()
 		{
-			cancellationSource.Cancel();
-			worker.Join();
 		}
 	}
 }

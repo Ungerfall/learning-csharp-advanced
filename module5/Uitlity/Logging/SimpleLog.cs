@@ -1,12 +1,14 @@
-﻿namespace Utility.Logging
+﻿using System.Runtime.CompilerServices;
+
+namespace Utility.Logging
 {
 	public static class SimpleLog
 	{
 		private static readonly Logger logger = new Logger();
 
-		public static void WriteLine(string text)
+		public static void WriteLine(string text, [CallerMemberName] string caller = null)
 		{
-			logger.Log(text);
+			logger.Log($"{caller ?? string.Empty}: {text}");
 		}
 
 		private class Logger : ILog

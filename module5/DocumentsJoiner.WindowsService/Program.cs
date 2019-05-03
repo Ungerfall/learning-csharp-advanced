@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
-using System.Threading;
-using DocumentsJoiner.Configuration;
-using DocumentsJoiner.Handlers;
-using DocumentsJoiner.IO;
-using DocumentsJoiner.Wrappers;
-using Messaging.RabbitMQ;
 using Topshelf;
+using Topshelf.Logging;
 
 namespace DocumentsJoiner.WindowsService
 {
@@ -16,22 +9,13 @@ namespace DocumentsJoiner.WindowsService
 	{
 		private const string LOG_FILE = "log.txt";
 		private const string SERVICE_NAME = "DocumentsJoiner";
-		private const string SERVICE_CONFIGURATION_SECTION = "DocumentsJoiner";
-
-		private static DocumentsJoinerWorker documentsJoinerWorker;
 
 		static void Main(string[] args)
 		{
 			InitializeDependencies();
 			var rc = HostFactory.Run(x =>
 			{
-				x.Service<DocumentsJoinerWorker>(s =>
-				{
-					s.ConstructUsing(
-						name => documentsJoinerWorker);
-					s.WhenStarted(tc => tc.Start());
-					s.WhenStopped(tc => tc.Stop());
-				});
+				x.Service<ServiceFacade>();
 				x.RunAsLocalSystem();
 
 				x.SetDisplayName(SERVICE_NAME);
@@ -45,36 +29,7 @@ namespace DocumentsJoiner.WindowsService
 		private static void InitializeDependencies()
 		{
 			Trace.Listeners.Add(new TextWriterTraceListener(LOG_FILE));
-			var configuration
-				= (DocumentsJoinerConfigurationSection) ConfigurationManager.GetSection(SERVICE_CONFIGURATION_SECTION);
-			var detector = new ZXingBarcodeDetector();
-			Func<DocumentsController, SortedDictionary<int, IDocumentHandler>> handlersChainFactory = ctrl =>
-			{
-				var sorted = new SortedDictionary<int, IDocumentHandler>
-				{
-					{1, new DocumentValidator(configuration.BrokenFilesDirectory)},
-					{2, new BarCodeHandler(detector, ctrl)},
-					{3, new ImageHandler(ctrl)},
-				};
-
-				return sorted;
-			};
-			var fileReader = new WaitForFile(configuration.AttemptsToOpenFile, configuration.OpeningFilePeriodMs);
-			var exceptionsHandler = new ErrorHandler(configuration.BrokenFilesDirectory);
-			Func<DocumentsController> controllersFactory
-				= () => new DocumentsController(
-					handlersChainFactory,
-					exceptionsHandler,
-					fileReader,
-					configuration.Timeout);
-			Func<CancellationToken, IDocumentsJoiner> joinerFactory
-				= token => new PdfSharpDocumentsJoiner(token, fileReader);
-			var queue = new ChunkedQueue();
-			documentsJoinerWorker = new DocumentsJoinerWorker(
-				configuration,
-				controllersFactory,
-				joinerFactory,
-				queue);
+			Trace.Listeners.Add(new TopshelfConsoleTraceListener());
 		}
 	}
 }

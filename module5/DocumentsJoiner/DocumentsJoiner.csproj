@@ -30,19 +30,33 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'joiner0|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\joiner0\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandsObserver.cs" />
+    <Compile Include="Configuration\ConfigurationContext.cs" />
     <Compile Include="Configuration\DocumentsJoinerConfigurationSection.cs" />
     <Compile Include="Configuration\FolderWatcherConfigurationCollection.cs" />
     <Compile Include="Configuration\FolderWatcherConfigurationElement.cs" />
     <Compile Include="Document.cs" />
     <Compile Include="DocumentBatch.cs" />
     <Compile Include="DocumentBatchEventArgs.cs" />
+    <Compile Include="DocumentsJoinerStatus.cs" />
     <Compile Include="DocumentsJoinerWorker.cs" />
+    <Compile Include="DocumentsJoinerStatusObserverWorker.cs" />
     <Compile Include="Handlers\BarCodeHandler.cs" />
     <Compile Include="Handlers\DocumentValidator.cs" />
     <Compile Include="DocumentsController.cs" />
@@ -54,9 +68,14 @@
     <Compile Include="IDocumentsJoiner.cs" />
     <Compile Include="IO\IWaitForFile.cs" />
     <Compile Include="IO\WaitForFile.cs" />
+    <Compile Include="IStatusObservable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Documents.Core\Documents.Core.csproj">
+      <Project>{635C33DF-1D9B-47AB-B496-EEB32ED20DD1}</Project>
+      <Name>Documents.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Messaging\Messaging.csproj">
       <Project>{5673436E-3DAE-4549-98FB-E4468AA31021}</Project>
       <Name>Messaging</Name>

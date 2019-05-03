@@ -30,6 +30,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'joiner0|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\joiner0\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Diagnostics.Tracing.EventSource, Version=1.1.28.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Diagnostics.Tracing.EventSource.Redist.1.1.28\lib\net46\Microsoft.Diagnostics.Tracing.EventSource.dll</HintPath>
@@ -38,11 +47,17 @@
       <HintPath>..\packages\RabbitMQ.Client.5.1.0\lib\net451\RabbitMQ.Client.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChunkedQueue.cs" />
+    <Compile Include="StatusMessagesConsumer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CommandsPublisher.cs" />
+    <Compile Include="StatusMessagesProducer.cs" />
+    <Compile Include="CommandsSubscriber.cs" />
+    <Compile Include="Utility\QueueManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

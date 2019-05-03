@@ -179,8 +179,7 @@ namespace DocumentsJoiner.Tests
 				= () => new DocumentsController(
 					handlersChainFactory,
 					exceptionsHandler,
-					fileReader,
-					configuration.Timeout);
+					fileReader);
 			Func<CancellationToken, IDocumentsJoiner> joinerFactory
 				= token => new PdfSharpDocumentsJoiner(token, fileReader);
 			var queue = new ChunkedQueue();
